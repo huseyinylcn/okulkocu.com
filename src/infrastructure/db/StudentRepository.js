@@ -26,6 +26,8 @@ let StudentRepository = {
                 .input("AylikGelir", sql.NVarChar, data.AylikGelir)
                 .input("AnneTel", sql.NVarChar, data.AnneTel)
                 .input("BabaTel", sql.NVarChar, data.BabaTel)
+                .input("photo", sql.NVarChar, data.photo)
+
                 .query(`
             INSERT INTO [dbo].[Ogrenciler]
                ([Sinif]
@@ -46,7 +48,9 @@ let StudentRepository = {
                ,[SuregenRahatsizlik]
                ,[AylikGelir]
                ,[AnneTel]
-               ,[BabaTel])
+               ,[BabaTel]
+               ,[Fotograf]
+               )
          VALUES
                (@Sinif
                ,@OgrenciNumara
@@ -66,7 +70,9 @@ let StudentRepository = {
                ,@SuregenRahatsizlik
                ,@AylikGelir
                ,@AnneTel
-               ,@BabaTel)
+               ,@BabaTel
+               ,@photo
+               )
                         
                         `)
             return true
@@ -76,6 +82,12 @@ let StudentRepository = {
             throw new Error(`kayıt Hatası: ${error.message}`)
         }
 
+    },
+    async studentGetAll(){
+        let result =await new sql.Request()
+        .query(`select * from [okulkocu].[dbo].[Ogrenciler]`)
+        
+        return result.recordset
     }
 
 

@@ -3,7 +3,7 @@
 
 class StudentEnity{
     constructor({Sinif,OgrenciNumara,AdSoyad,TCKimlikNo,Cinsiyet,DogumTarihi,
-        AnneAdSoyad,BabaAdSoyad,VeliDurum,Sag,Engel,AnneEgitim,BabaEgitim,AnneMeslek,BabaMeslek,SuregenRahatsizlik,AylikGelir,AnneTel,BabaTel }){
+        AnneAdSoyad,BabaAdSoyad,VeliDurum,Sag,Engel,AnneEgitim,BabaEgitim,AnneMeslek,BabaMeslek,SuregenRahatsizlik,AylikGelir,AnneTel,BabaTel,photo }){
         if (!Sinif) throw new Error("Sınıf Girilmemiş")
         if (!OgrenciNumara ) throw new Error("Öğrenci Numarası Girilmemiş")
         if (!AdSoyad ) throw new Error("Ad Soyad Girilmemiş")
@@ -30,6 +30,7 @@ class StudentEnity{
         this.Engel = Engel
         this.VeliDurum = VeliDurum
         this.Sag = Sag
+        this.photo = photo
 
 
     }
