@@ -4,12 +4,14 @@
 class StudentEnity{
     constructor({Sinif,OgrenciNumara,AdSoyad,TCKimlikNo,Cinsiyet,DogumTarihi,
         AnneAdSoyad,BabaAdSoyad,VeliDurum,Sag,Engel,AnneEgitim,BabaEgitim,AnneMeslek,BabaMeslek,SuregenRahatsizlik,AylikGelir,AnneTel,BabaTel,photo }){
-        if (!Sinif) throw new Error("Sınıf Girilmemiş")
-        if (!OgrenciNumara ) throw new Error("Öğrenci Numarası Girilmemiş")
+        
         if (!AdSoyad ) throw new Error("Ad Soyad Girilmemiş")
-        if (!BabaAdSoyad ) throw new Error("Baba Ad Soyad Girilmemiş")
-        if (!AnneAdSoyad ) throw new Error("Anne Ad Soyad Girilmemiş")
-        if (!TCKimlikNo ) throw new Error("Tc Kimlik No Girilmemiş")
+        if (!OgrenciNumara ) throw new Error("Öğrenci Numarası Girilmemiş")
+        if (!Sinif) throw new Error("Sınıf Girilmemiş")
+        if (!BabaAdSoyad ) throw new Error("Baba Ad Soyadd Girilmemiş x3")
+        if (!AnneAdSoyad ) throw new Error("Anne Ad Soyaddd Girilmemiş x4")
+        if (!TCKimlikNo ) throw new Error("ccc v Tc Kimlik No Girilmemiş ccc v")
+        
         
         this.Sinif = Sinif
         this.OgrenciNumara = OgrenciNumara

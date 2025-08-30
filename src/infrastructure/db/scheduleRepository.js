@@ -1,17 +1,20 @@
 const sql = require("mssql")
-const scheduleEnity = require("../../domain/schedule/scheduleEnity")
+
 
 let scheduleRepository = {
     async scheduleCreate(data){
         try {
-            await new sql.Request()
+           let result=  await new sql.Request()
             .input("Gun",sql.NVarChar,data.Gun)
             .input("DersSaati",sql.NVarChar,data.DersSaati)
             .input("OgretmenID",sql.Int,data.OgretmenID)
             .input("Sinif",sql.NVarChar,data.Sinif)
             .input("Ders",sql.NVarChar,data.Ders)
             .query(`
-                INSERT INTO [dbo].[DersProgrami]
+     
+DECLARE @NewID INT;
+
+INSERT INTO [dbo].[DersProgrami]
            ([Gun]
            ,[DersSaati]
            ,[OgretmenID]
@@ -22,15 +25,57 @@ let scheduleRepository = {
            ,@DersSaati
            ,@OgretmenID
            ,@Sinif
-           ,@Ders
-           )
+           ,@Ders);
+
+SET @NewID = SCOPE_IDENTITY();
+
+SELECT @NewID AS ProgramID;
+
+
                 `)
-                return true
+                console.log(result.recordset[0].ProgramID)
+                return result.recordset[0].ProgramID
             
         } catch (error) {
+            console.log(error)
             throw new Error(`Sql Kayıt Hatası ${error.message}`)
         }
+    },
+
+
+
+    async getTeacher(data){
+        try {
+          
+            let result = await new sql.Request()
+            .input("id",sql.Int,data.id)
+            .query(`
+                SELECT *
+  FROM [okulkocu].[dbo].[DersProgrami]
+  WHERE OgretmenID = @id
+
+                `)
+                return result.recordset
+        } catch (error) {
+            throw new Error("SQL GET HATASI")
+        }
+
+    },
+    async scheduleDelete(data){
+        try {
+            await new sql.Request()
+            .input("id",sql.Int,data.id)
+            .query(`
+                DELETE
+                    FROM [okulkocu].[dbo].[DersProgrami]
+                    WHERE ProgramID = @id
+                `)
+                return true
+        } catch (error) {
+             throw new Error("SQL DELETE HATASI")
+        }
     }
+
 }
 
 

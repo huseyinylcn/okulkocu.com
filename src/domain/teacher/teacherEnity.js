@@ -1,12 +1,17 @@
 
 
 class TeacherEnity{
-    constructor({AdSoyad,Cinsiyet,DogumTarihi,TCKimlikNo,Telefon,Eposta,Bolum}){
+    constructor({AdSoyad,Cinsiyet,DogumTarihi,TCKimlikNo,Telefon,Eposta,Bolum,photo}){
         if(!AdSoyad) throw new Error("ad ve soyad girilmemiş")
+        if(!TCKimlikNo) throw new Error("Tc Kimlik NO Girilmemiş tttccc")
+        if(!Telefon) throw new Error("Telefon Girilmemiş")
+            if(!Eposta) throw new Error("E-POSTA ")
         if(!Bolum) throw new Error("Bolum girilmemiş")
         if(!DogumTarihi) throw new Error("Doğum Tarihi Girilmemiş")
-        if(!Telefon) throw new Error("Telefon Girilmemiş")
-        if(!TCKimlikNo) throw new Error("Tc Kimlik NO Girilmemiş")
+        
+        
+        
+
 
 
         this.AdSoyad = AdSoyad
@@ -16,7 +21,7 @@ class TeacherEnity{
         this.Telefon = Telefon
         this.Eposta = Eposta
         this.Bolum = Bolum
-        
+        this.Fotograf = photo
     }
 }
 

@@ -78,7 +78,9 @@ let StudentRepository = {
             return true
 
         } catch (error) {
-            console.log(error)
+    
+            // if(error.message.includes("UNIQUE KEY ")) console.log("UNIQUE Hatası ")
+            
             throw new Error(`kayıt Hatası: ${error.message}`)
         }
 
@@ -88,6 +90,54 @@ let StudentRepository = {
         .query(`select * from [okulkocu].[dbo].[Ogrenciler]`)
         
         return result.recordset
+    },
+    async classAdd(data){
+        try {
+         
+            await new sql.Request()
+            .input("SinifKodu",sql.NVarChar,data.SinifKodu)
+            .input("SinifAdi",sql.NVarChar,data.SinifAdi)
+            .input("Derslik",sql.NVarChar,data.Derslik)
+            .input("Devre",sql.NVarChar,data.Devre)
+            .query(`
+                INSERT INTO [dbo].[Siniflar]
+           ([SinifKodu]
+           ,[SinifAdi]
+           ,[Derslik]
+           ,[Devre])
+     VALUES
+           (@SinifKodu
+           ,@SinifAdi
+           ,@Derslik
+           ,@Devre
+           )
+                `)
+
+            return true
+
+            
+        } catch (error) {
+
+             if (error.message.includes("PRIMARY KEY")) {
+            return "primer"
+        } else if(error.message.includes("UNIQUE KEY")){
+            return "unique"
+        }else{
+throw new Error("SQL Hatası")
+        }
+           
+            
+        }
+
+    },
+    async classGet(){
+        try {
+            let result = await new sql.Request()
+            .query(`select * from [dbo].[Siniflar]`)
+            return result.recordset
+        } catch (error) {
+            throw new Error("SQL Hatası")
+        }
     }
 
 
