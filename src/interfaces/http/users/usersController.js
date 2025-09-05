@@ -3,6 +3,8 @@ const userRepository = require("./../../../infrastructure/db/userRepository")
 const loginC = require("./../../../use-cases/users/login")
 const createAdmin = require("./../../../use-cases/users/create")
 const infoUser = require("./../../../use-cases/users/info")
+const tokenUseCase = require("./../../../use-cases/users/token")
+
 
 
 const jwtService = require("./../../../infrastructure/jwt/jwtService")
@@ -41,8 +43,19 @@ async function info(req,res) {
 }
 
 
+async function token(req,res) {
+    try {
+        let result = await tokenUseCase(req.body,{userRepository})
+        res.status(200).json(result)
+    } catch (error) {
+        res.status(400).json({error:error.message})
+    }
+}
 
 
 
 
-module.exports = {login,create,info}
+
+
+
+module.exports = {login,create,info,token}

@@ -59,19 +59,13 @@ const userRepository = {
         }
     },
     async adminInfo(data) {
+       
         try {
             let result = await new sql.Request()
                 .input("id", sql.NVarChar, data.id)
                 .query(`
                 SELECT 
-      [AdSoyad]
-      ,[Cinsiyet]
-      ,[DogumTarihi]
-      ,[TCKimlikNo]
-      ,[Telefon]
-      ,[Eposta]
-      ,[Bolum]
-      ,[Fotograf]
+ *
   FROM [okulkocu].[dbo].[Yoneticiler] where AdminID = @id
                 `)
             return result
@@ -79,7 +73,6 @@ const userRepository = {
             res.status(400).json({ error: error.message })
         }
     },
-
 
     async studentInfo(data) {
         try {
@@ -97,7 +90,11 @@ const userRepository = {
     },
 
        async teacherInfo(data) {
+      
         try {
+
+
+
             let result = await new sql.Request()
                 .input("id", sql.NVarChar, data.id)
                 .query(`
@@ -118,6 +115,40 @@ const userRepository = {
             res.status(400).json({ error: error.message })
         }
     },
+
+       async token(data) {
+      
+        try {
+
+
+
+            let result = await new sql.Request()
+                .input("fcm_token", sql.NVarChar, data.fcm_token)
+                .input("user_id", sql.Int, data.user_id)
+                .input("user_type", sql.NVarChar, data.user_type)
+
+                .query(`
+
+MERGE [dbo].[FCM_TOKEN] AS target
+USING (VALUES (@user_type, @user_id, @fcm_token)) AS source ([user_type], [user_id], [fcm_token])
+    ON target.[fcm_token] = source.[fcm_token]
+WHEN MATCHED THEN 
+    UPDATE SET 
+        target.[user_type] = source.[user_type],
+        target.[user_id] = source.[user_id]
+WHEN NOT MATCHED THEN
+    INSERT ([user_type], [user_id], [fcm_token])
+    VALUES (source.[user_type], source.[user_id], source.[fcm_token]);
+
+
+                `)
+            return true
+        } catch (error) {
+            res.status(400).json({ error: error.message })
+        }
+    },
+
+
 }
 
 

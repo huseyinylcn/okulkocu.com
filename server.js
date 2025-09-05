@@ -1,6 +1,10 @@
 require("dotenv").config()
 const connectDB = require("./src/config/database")
 const app = require("./src/app")
+const serviceAccount = require("./okulkocu-d8a73-firebase-adminsdk-fbsvc-f90cfdc3f3.json");
+const {initFirebase} = require("./src/infrastructure/middleware/fcm_token");
+initFirebase(serviceAccount)
+
 
 const PORT = process.env.PORT || 3000
 

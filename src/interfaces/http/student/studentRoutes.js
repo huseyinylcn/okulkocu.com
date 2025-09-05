@@ -13,6 +13,14 @@ router.post("/all",jwtService.authenticateToken, studentController.all)
 
 router.post("/classadd",jwtService.authenticateToken, studentController.classAdd)
 router.post("/classall",jwtService.authenticateToken, studentController.classAll)
+router.post("/homework",jwtService.authenticateToken, studentController.homework)
+router.post("/exam",jwtService.authenticateToken, studentController.exam)
+router.post("/point",jwtService.authenticateToken, studentController.point)
+
+
+router.post("/attendance",jwtService.authenticateToken, studentController.attendance)
+
+
 
 
 
