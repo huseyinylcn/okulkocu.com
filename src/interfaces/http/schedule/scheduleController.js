@@ -7,7 +7,12 @@ const gainaddUseCase = require("./../../../use-cases/schedule/gainadd")
 const getclassUseCase = require("./../../../use-cases/schedule/getclass")
 const derslerUseCase = require("./../../../use-cases/schedule/dersler")
 const schoolsUseCase = require("./../../../use-cases/schedule/schools")
+const lessonaddUseCase = require("./../../../use-cases/schedule/lessonadd")
+const lessondeleteUseCase = require("./../../../use-cases/schedule/lessondelete")
+
+
 const scheduleRepository = require("./../../../infrastructure/db/scheduleRepository")
+
 
 
 
@@ -106,4 +111,35 @@ async function schools(req,res,next) {
 
 
 
-module.exports = {create,getteacher,scheduleDelete,gain,gainadd,getclass,dersler,schools}
+
+async function schools(req,res,next) {
+     try {
+        let result = await schoolsUseCase(req.body,{scheduleRepository})
+         res.status(200).json(result)
+     } catch (error) {
+          res.status(400).json({error:error.message})
+     }
+}
+
+async function lessonadd(req,res,next) {
+     try {
+        let result = await lessonaddUseCase(req.body,{scheduleRepository})
+         res.status(200).json(result)
+     } catch (error) {
+          res.status(400).json({error:error.message})
+     }
+}
+
+
+async function lessondelete(req,res,next) {
+     try {
+          
+        let result = await lessondeleteUseCase(req.body,{scheduleRepository})
+         res.status(200).json(result)
+     } catch (error) {
+     
+          res.status(400).json({error:error.message})
+     }
+}
+
+module.exports = {create,getteacher,scheduleDelete,gain,gainadd,getclass,dersler,schools,lessonadd,lessondelete}

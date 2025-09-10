@@ -14,24 +14,28 @@ let TeacherRepository = {
         .input("Bolum", sql.NVarChar, data.Bolum)
         .input("Fotograf", sql.NVarChar, data.Fotograf)
 
-        .query(`INSERT INTO [dbo].[Ogretmenler]
-                    ([AdSoyad]
-                    ,[Cinsiyet]
-                    ,[DogumTarihi]
-                    ,[TCKimlikNo]
-                    ,[Telefon]
-                    ,[Eposta]
-                    ,[Bolum]
-                    ,[Fotograf])
-                      VALUES
-                      (@AdSoyad
-                      ,@Cinsiyet
-                      ,@DogumTarihi
-                      ,@TCKimlikNo
-                      ,@Telefon
-                      ,@Eposta
-                      ,@Bolum
-                      ,@Fotograf)`)
+        .query(`
+          
+          
+MERGE INTO Ogretmenler AS target
+USING (SELECT @TCKimlikNo AS TCKimlikNo) AS source
+ON target.TCKimlikNo = source.TCKimlikNo
+WHEN MATCHED THEN
+    UPDATE SET 
+        AdSoyad = @AdSoyad,
+        Cinsiyet = @Cinsiyet,
+        DogumTarihi = @DogumTarihi,
+        Telefon = @Telefon,
+        Eposta = @Eposta,
+        Bolum = @Bolum,
+        Fotograf = @Fotograf
+WHEN NOT MATCHED THEN
+    INSERT (AdSoyad, Cinsiyet, DogumTarihi, TCKimlikNo, Telefon, Eposta, Bolum, Fotograf)
+    VALUES (@AdSoyad, @Cinsiyet, @DogumTarihi, @TCKimlikNo, @Telefon, @Eposta, @Bolum, @Fotograf);
+
+                      
+                      
+                      `)
 
 
 
@@ -157,13 +161,34 @@ let TeacherRepository = {
         .input("durum", sql.Int, data.durum)
 
         .query(`
-          DELETE FROM [dbo].[yoklama]
-          WHERE tarih = @tarih
-            AND OgrenciID = @OgrenciID
-            AND ProgramID = @ProgramID;
-
-          INSERT INTO [dbo].[yoklama] (tarih, OgrenciID, ProgramID, durum)
-          VALUES (@tarih, @OgrenciID, @ProgramID, @durum);
+ 
+MERGE INTO [dbo].[yoklama] AS target
+USING (
+    SELECT 
+        @tarih AS tarih,
+        @OgrenciID AS OgrenciID,
+        dp.ProgramID,
+        @durum AS durum,
+        dp.Gun,
+        dp.DersSaati,
+        dp.Ders,
+        dp.Sinif
+    FROM [dbo].[DersProgrami] dp
+    WHERE dp.ProgramID = @ProgramID
+) AS source
+ON target.tarih = source.tarih
+   AND target.ProgramID = source.ProgramID
+   AND target.OgrenciID = source.OgrenciID
+WHEN MATCHED THEN
+    UPDATE SET 
+        target.durum = source.durum,
+        target.Gun = source.Gun,
+        target.DersSaati = source.DersSaati,
+        target.Ders = source.Ders,
+        target.Sinif = source.Sinif
+WHEN NOT MATCHED THEN
+    INSERT (tarih, OgrenciID, ProgramID, durum, Gun, DersSaati, Ders, Sinif)
+    VALUES (source.tarih, source.OgrenciID, source.ProgramID, source.durum, source.Gun, source.DersSaati, source.Ders, source.Sinif);
 
 
 
@@ -486,6 +511,37 @@ delete from notlar where SinavId = @id
 
 
 
+  async deletee(data) {
+    try {
+    console.log(data)
+      let result = await new sql.Request()
+
+        .input("OgretmenID", sql.Int, data.OgretmenID)
+        .query(`
+
+ BEGIN TRANSACTION;
+
+                    -- 1. notlar tablosu
+                    DELETE FROM [okulkocu].[dbo].[DersProgrami]
+                    WHERE OgretmenID = @OgretmenID;
+
+                    -- 2. odev tablosu
+                    DELETE FROM [okulkocu].[dbo].[Ogretmenler]
+                    WHERE OgretmenID = @OgretmenID;
+
+             
+
+                    COMMIT TRANSACTION;
+  
+              `)
+
+      return true
+
+    } catch (error) {
+      console.log(error)
+      throw new Error(`SQL GET HATASI ${error.message}`)
+    }
+  },
 
 
 
@@ -494,6 +550,194 @@ delete from notlar where SinavId = @id
 
 
 
+
+  async classdeletee(data) {
+    try {
+    console.log(data)
+      let result = await new sql.Request()
+
+        .input("Sinif", sql.NVarChar, data.Sinif)
+        .query(`
+delete
+  FROM [okulkocu].[dbo].[Siniflar] where SinifAdi = @Sinif
+  
+              `)
+
+      return true
+
+    } catch (error) {
+      console.log(error)
+      throw new Error(`SQL GET HATASI ${error.message}`)
+    }
+  },
+
+
+
+    async attendanceRapor(data) {
+    try {
+    console.log(data)
+      let result = await new sql.Request()
+
+        .input("Sinif", sql.NVarChar, data.Sinif)
+        .input("baslangictarih", sql.Date, data.baslangictarih)
+        .input("bitistarih", sql.Date, data.bitistarih)
+
+
+        .query(`
+
+            SELECT y.Sinif, y.tarih, y.OgrenciID,y.Gun ,y.DersSaati, y.Ders,dk.kazanim, o.AdSoyad,o.OgrenciNumara
+            FROM [okulkocu].[dbo].[yoklama] y
+            
+            inner join [okulkocu].[dbo].[Ogrenciler] o on o.OgrenciId = y.OgrenciID
+            left join [okulkocu].[dbo].[DersKazanimlari] dk on dk.ProgramID = y.ProgramID
+            
+            
+            where y.Sinif = @Sinif and y.tarih >=  @baslangictarih and y.tarih <= @bitistarih and y.durum = 0 
+
+  
+              `)
+
+      return result.recordset
+
+    } catch (error) {
+      console.log(error)
+      throw new Error(`SQL GET HATASI ${error.message}`)
+    }
+  },
+
+
+async pointRapor(data) {
+    try {
+ 
+      let result = await new sql.Request()
+
+        .input("id", sql.Int, data.id)
+        .query(`
+              SELECT  s.id,o.AdSoyad, o.OgrenciId, o.OgrenciNumara, n.puan
+              FROM [okulkocu].[dbo].[sinavlar] s
+              inner join [okulkocu].[dbo].[Ogrenciler]  o on s.Sinif = o.Sinif
+              left join [okulkocu].[dbo].[notlar] n on s.id = n.SinavId and o.OgrenciId = n.OgrenciId
+              where s.id = @id
+              `)
+
+      return result.recordset
+
+    } catch (error) {
+      throw new Error(`SQL GET HATASI ${error.message}`)
+    }
+  },
+
+  async mesajget(data) {
+    try {
+ 
+      let result = await new sql.Request()
+
+        .input("id", sql.NVarChar, data.id)
+
+        .query(`
+          SELECT 
+          
+          ms.mesaj,ms.gonderenTipi, ms.tarih,
+
+            CASE 
+                  WHEN ms.gonderenTipi = 'student' THEN o.AdSoyad
+                  WHEN ms.gonderenTipi = 'admin'   THEN 'Okul Yönetimi'
+              END AS AdSoyad,
+
+              CASE 
+                  WHEN ms.gonderenTipi = 'student' THEN o.Sinif
+                  WHEN ms.gonderenTipi = 'admin'   THEN '-'
+              END AS Sinif,
+
+            CASE 
+                  WHEN ms.gonderenTipi = 'student' THEN o.OgrenciNumara
+                  WHEN ms.gonderenTipi = 'admin'   THEN '-'
+              END AS OgrenciNumara
+
+
+
+            FROM [okulkocu].[dbo].[mesaj] ms
+            left join [okulkocu].[dbo].[Ogrenciler] o on ms.gonderenTipi = 'student' and ms.gonderenID = o.OgrenciId
+
+
+            where ms.aliciTipi = 'allteacher' or (ms.aliciTipi = 'teacher' and ms.AliciID = @id)
+
+
+  
+              `)
+
+      return result.recordset
+
+    } catch (error) {
+      throw new Error(`SQL GET HATASI ${error.message}`)
+    }
+  },
+
+async homeworkpoint(data) {
+    try {
+ 
+      let result = await new sql.Request()
+
+        .input("id", sql.Int, data.id)
+        .input("KayitTuru", sql.Int, data.KayitTuru)
+
+        .query(`
+                IF (SELECT KayitTuru FROM [okulkocu].[dbo].[odev] WHERE id = @id) = 0
+                BEGIN
+                    SELECT ogrenci.AdSoyad,ogrenci.OgrenciNumara, odev.TeslimTarihi, odev.id, ogrenci.OgrenciId, p.puan , odev.KayitTuru
+                    FROM [okulkocu].[dbo].[odev] odev
+                    INNER JOIN [okulkocu].[dbo].[Ogrenciler] ogrenci ON ogrenci.Sinif = odev.Sinif
+                    LEFT JOIN [okulkocu].[dbo].[odevPuanları] p ON odev.id = p.odevID AND p.OgrenciID = ogrenci.OgrenciId
+                    WHERE odev.id = @id
+                END
+                ELSE
+                BEGIN
+                    SELECT ogrenci.AdSoyad,ogrenci.OgrenciNumara, odev.TeslimTarihi, odev.id, ogrenci.OgrenciId, p.puan , odev.KayitTuru
+                    FROM [okulkocu].[dbo].[odev] odev
+                    INNER JOIN [okulkocu].[dbo].[Ogrenciler] ogrenci ON ogrenci.OgrenciId = odev.OgrenciID
+                    LEFT JOIN [okulkocu].[dbo].[odevPuanları] p ON odev.id = p.odevID AND p.OgrenciID = ogrenci.OgrenciId
+                    WHERE odev.id = @id
+                END
+              `)
+
+      return result.recordset
+
+    } catch (error) {
+      throw new Error(`SQL GET HATASI ${error.message}`)
+    }
+  },
+
+
+
+  
+
+
+  async homeworkpointadd(data) {
+    try {
+ 
+      let result = await new sql.Request()
+
+        .input("odevID", sql.Int, data.odevID)
+        .input("puan", sql.NVarChar, data.puan)
+        .input("OgrenciID", sql.Int, data.OgrenciID)
+
+        .query(`
+                MERGE [dbo].[odevPuanları] AS target
+                USING (SELECT @odevID AS odevID, @OgrenciID AS OgrenciID, @puan AS puan) AS source
+                    ON target.odevID = source.odevID AND target.OgrenciID = source.OgrenciID
+                WHEN MATCHED THEN
+                    UPDATE SET puan = source.puan
+                WHEN NOT MATCHED THEN
+                    INSERT (odevID, puan, OgrenciID)
+                    VALUES (source.odevID, source.puan, source.OgrenciID);
+              `)
+
+      return result.recordset
+
+    } catch (error) {
+      throw new Error(`SQL GET HATASI ${error.message}`)
+    }
+  },
 
 }
 

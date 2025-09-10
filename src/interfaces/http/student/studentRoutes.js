@@ -16,6 +16,12 @@ router.post("/classall",jwtService.authenticateToken, studentController.classAll
 router.post("/homework",jwtService.authenticateToken, studentController.homework)
 router.post("/exam",jwtService.authenticateToken, studentController.exam)
 router.post("/point",jwtService.authenticateToken, studentController.point)
+router.post("/delete",jwtService.authenticateToken, studentController.deletee)
+router.post("/filecre",jwtService.authenticateToken,upload.single("photo"), studentController.filecreate)
+router.post("/mesajget",jwtService.authenticateToken, studentController.mesajget)
+
+
+
 
 
 router.post("/attendance",jwtService.authenticateToken, studentController.attendance)

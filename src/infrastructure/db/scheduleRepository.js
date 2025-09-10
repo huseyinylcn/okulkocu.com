@@ -1,4 +1,5 @@
 const sql = require("mssql")
+const { lessonadd } = require("../../interfaces/http/schedule/scheduleController")
 
 
 let scheduleRepository = {
@@ -53,7 +54,7 @@ SELECT @NewID AS ProgramID;
                 .query(`
                     SELECT dp.*, s.Derslik
                     FROM [okulkocu].[dbo].[DersProgrami]
-                    dp inner join [okulkocu].[dbo].[Siniflar] s on dp.Sinif = s.SinifAdi  where dp.OgretmenID = 39 and dp.Gun = @tarih
+                    dp inner join [okulkocu].[dbo].[Siniflar] s on dp.Sinif = s.SinifAdi  where dp.OgretmenID = @id and dp.Gun = @tarih
 
                 `)
             return result.recordset
@@ -62,6 +63,20 @@ SELECT @NewID AS ProgramID;
         }
 
     },
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     async scheduleDelete(data) {
         try {
             await new sql.Request()
@@ -186,8 +201,42 @@ WHEN NOT MATCHED THEN
             throw new Error("SQL DELETE HATASI")
         }
     },
-}
 
+       async lessonadd(data) {
+        try {
+
+            let result = await new sql.Request()
+            .input("lesson",sql.NVarChar,data.lesson)
+                .query(`
+                INSERT INTO [dbo].[Dersler]
+                    ([isim])
+                VALUES
+                (@lesson)
+                `)
+            return true
+        } catch (error) {
+    
+            throw new Error("SQL DELETE HATASI")
+        }
+    },
+
+
+    async lessondelete(data) {
+        try {
+
+            let result = await new sql.Request()
+            .input("lesson",sql.NVarChar,data.lesson)
+                .query(`
+                    DELETE
+                    FROM [okulkocu].[dbo].[Dersler] where isim = @lesson
+                `)
+            return true
+        } catch (error) {
+    
+            throw new Error("SQL DELETE HATASI")
+        }
+    },
+}
 
 
 module.exports = scheduleRepository

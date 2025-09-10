@@ -12,6 +12,17 @@ const examgetUseCase = require("./../../../use-cases/teacher/examget")
 const examdeleteUseCase = require("./../../../use-cases/teacher/examdelete")
 const pointUseCase = require("./../../../use-cases/teacher/point")
 const pointaddUseCase = require("./../../../use-cases/teacher/pointadd")
+const deleteeUseCase = require("./../../../use-cases/teacher/deletee")
+const classdeleteeUseCase = require("./../../../use-cases/teacher/classdeletee")
+const attendanceRaporUseCase = require("./../../../use-cases/teacher/attendanceRapor")
+const pointRaporUseCase = require("./../../../use-cases/teacher/pointRapor")
+const mesajgetUseCase = require("./../../../use-cases/teacher/mesajget")
+const homeworkpointUseCase = require("./../../../use-cases/teacher/homeworkpoint")
+const homeworkpointaddUseCase = require("./../../../use-cases/teacher/homeworkpointadd")
+
+
+
+
 
 const { sendNotification } = require("./../../../infrastructure/middleware/fcm_token");
 
@@ -35,7 +46,7 @@ async function create(req, res) {
     try {
         if (req.file != undefined) req.body.photo = req.file.filename
         else req.body.photo = "default.png"
-
+        console.log(req.body.Cinsiyet)
         let result = await TeacherCreate(req.body, { TeacherRepository })
         res.status(200).json({ result })
 
@@ -80,6 +91,8 @@ async function schedule(req, res) {
         res.status(400).json({ error: error.message })
     }
 }
+
+
 
 
 async function dersler(req, res) {
@@ -211,5 +224,89 @@ async function pointadd(req, res) {
 }
 
 
+async function deletee(req, res) {
+    try {
+        let result = await deleteeUseCase(req.body, { TeacherRepository })
+        res.status(200).json(result)
+    } catch (error) {
+        console.log(error)
+        res.status(400).json({ error: error.message })
+    }
+}
 
-module.exports = { create, allTeacher, schedule, dersler, attendance, attendanceadd, homework, homeworkget, homeworkdelete, exam, examget, examdelete, point, pointadd }
+
+
+async function classdeletee(req, res) {
+    try {
+        let result = await classdeleteeUseCase(req.body, { TeacherRepository })
+        res.status(200).json(result)
+    } catch (error) {
+        console.log(error)
+        res.status(400).json({ error: error.message })
+    }
+}
+
+
+async function attendanceRapor(req, res) {
+    try {
+        let result = await attendanceRaporUseCase(req.body, { TeacherRepository })
+
+        res.setHeader("Content-Type", "application/pdf");
+        res.setHeader("Content-Disposition", "attachment; filename=gunluk_rapor.pdf");
+        res.status(200).send(result);
+
+
+    } catch (error) {
+        console.log(error)
+        res.status(400).json({ error: error.message })
+    }
+}
+async function pointRapor(req, res) {
+    try {
+        let result = await pointRaporUseCase(req.body, { TeacherRepository })
+
+        res.setHeader("Content-Type", "application/pdf");
+        res.setHeader("Content-Disposition", "attachment; filename=gunluk_rapor.pdf");
+        res.status(200).send(result);
+
+
+    } catch (error) {
+        console.log(error)
+        res.status(400).json({ error: error.message })
+    }
+}
+
+
+
+async function mesajget(req, res) {
+    try {
+        let result = await mesajgetUseCase(req.body, { TeacherRepository })
+        res.status(200).json(result)
+    } catch (error) {
+        console.log(error)
+        res.status(400).json({ error: error.message })
+    }
+}
+
+
+async function homeworkpoint(req, res) {
+    try {
+        let result = await homeworkpointUseCase(req.body, { TeacherRepository })
+        res.status(200).json(result)
+    } catch (error) {
+        console.log(error)
+        res.status(400).json({ error: error.message })
+    }
+}
+
+async function homeworkpointadd(req, res) {
+    try {
+        let result = await homeworkpointaddUseCase(req.body, { TeacherRepository })
+        res.status(200).json(result)
+    } catch (error) {
+        console.log(error)
+        res.status(400).json({ error: error.message })
+    }
+}
+
+module.exports = { create, allTeacher, schedule, dersler,mesajget, attendance, attendanceadd, homeworkpoint, homeworkpointadd, homework,pointRapor, homeworkget, homeworkdelete, exam, examget, examdelete, point, pointadd, deletee,classdeletee ,attendanceRapor}

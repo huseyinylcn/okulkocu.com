@@ -30,7 +30,7 @@ const sendNotification = async (registrationToken, title, body, data = {}) => {
         return response;
     } catch (error) {
         console.error("Hata oluştu:", error);
-        throw error;
+       
     }
 };
 

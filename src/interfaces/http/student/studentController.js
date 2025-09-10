@@ -5,6 +5,12 @@ const homeworkUseCase = require("./../../../use-cases/student/homework")
 const attendanceUseCase = require("./../../../use-cases/student/attendance")
 const examUseCase = require("./../../../use-cases/student/exam")
 const pointUseCase = require("./../../../use-cases/student/point")
+const deleteeUseCase = require("./../../../use-cases/student/deletee")
+const filecreateUseCase = require("./../../../use-cases/student/filecreate")
+const mesajgetUseCase = require("./../../../use-cases/student/mesajget")
+
+
+
 
 
 
@@ -143,4 +149,40 @@ async function point(req,res) {
     
 }
 
-module.exports = {create,all,classAdd,classAll,homework,attendance,exam,point}
+async function deletee(req,res) {
+    try {
+       
+        let result = await deleteeUseCase(req.body,{StudentRepository})
+        res.status(200).json(result)
+    } catch (error) {
+        res.status(400).json({error:error.message})
+    }
+    
+}
+
+
+async function filecreate(req,res) {
+    try {
+
+        if(req.file != undefined) req.body.filename = req.file.filename
+        else  res.status(400).json(false)
+     let result = await filecreateUseCase(req.body,{StudentRepository})
+        res.status(200).json(result)
+    } catch (error) {
+        console.log(error)
+        res.status(400).json({error:error.message})
+    }
+    
+}
+async function mesajget(req,res) {
+    try {
+       
+        let result = await mesajgetUseCase(req.body,{StudentRepository})
+        res.status(200).json(result)
+    } catch (error) {
+        res.status(400).json({error:error.message})
+    }
+    
+}
+
+module.exports = {create,all,classAdd,classAll,homework,attendance,exam,point,deletee,filecreate,mesajget}

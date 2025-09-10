@@ -15,7 +15,7 @@ class TeacherEnity{
 
 
         this.AdSoyad = AdSoyad
-        this.Cinsiyet = Cinsiyet
+        this.Cinsiyet = Number(Cinsiyet)
         this.DogumTarihi = DogumTarihi
         this.TCKimlikNo = TCKimlikNo
         this.Telefon = Telefon

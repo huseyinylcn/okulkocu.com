@@ -19,6 +19,20 @@ router.post("/examget",jwtService.authenticateToken,teacherController.examget)
 router.post("/examdelete",jwtService.authenticateToken,teacherController.examdelete)
 router.post("/point",jwtService.authenticateToken,teacherController.point)
 router.post("/point/add",jwtService.authenticateToken,teacherController.pointadd)
+router.post("/delete",jwtService.authenticateToken,teacherController.deletee)
+router.post("/class/delete",jwtService.authenticateToken,teacherController.classdeletee)
+router.post("/attendanceRapor",jwtService.authenticateToken,teacherController.attendanceRapor)
+router.post("/point/rapor",jwtService.authenticateToken,teacherController.pointRapor)
+router.post("/mesajget",jwtService.authenticateToken,teacherController.mesajget)
+router.post("/homework/point",jwtService.authenticateToken,teacherController.homeworkpoint)
+router.post("/homework/pointadd",jwtService.authenticateToken,teacherController.homeworkpointadd)
+
+
+
+
+
+
+
 
 
 
